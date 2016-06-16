@@ -532,7 +532,7 @@
         self._onLiveChange = function(e)
         {
           var date;
-          
+
           if (hasMoment) {
             date = moment(opts.field.value, opts.format, opts.formatStrict);
             date = (date && date.isValid()) ? date.toDate() : null;

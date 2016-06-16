@@ -418,6 +418,7 @@
     {
         var self = this,
             opts = self.config(options);
+        self.regex = new RegExp( opts.format.replace(/D/g, "\\d").replace(/Y/g, "\\d").replace(/M/g, "\\d").replace(/\./g, "\\."));
 
         self._onMouseDown = function(e)
         {
@@ -527,6 +528,26 @@
             }
         };
 
+
+        self._onLiveChange = function(e)
+        {
+          var date;
+          
+          if (hasMoment) {
+            date = moment(opts.field.value, opts.format, opts.formatStrict);
+            date = (date && date.isValid()) ? date.toDate() : null;
+          } else {
+              date = new Date(Date.parse(opts.field.value));
+          }
+          if ( isDate( date ) ) {
+            self.gotoDate(date);
+            if(self.regex.test(opts.field.value)) {
+              self.setDate( date );
+            }
+          }
+        };
+
+
         self._onInputFocus = function()
         {
             self.show();
@@ -597,7 +618,9 @@
             } else {
                 opts.field.parentNode.insertBefore(self.el, opts.field.nextSibling);
             }
+
             addEvent(opts.field, 'change', self._onInputChange);
+            addEvent(opts.field, 'keyup', self._onLiveChange);
 
             if (!opts.defaultDate) {
                 if (hasMoment && opts.field.value) {

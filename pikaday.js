@@ -258,6 +258,9 @@
         // Theme Classname
         theme: null,
 
+        // Live change calendar on typing
+        liveEdit: true,
+
         // callback function
         onSelect: null,
         onOpen: null,
@@ -483,25 +486,32 @@
             e = e || window.event;
 
             if (self.isVisible()) {
-
                 switch(e.keyCode){
                     case 13:
                     case 27:
                         opts.field.blur();
                         break;
                     case 37:
+                      if( !opts.liveEdit ) {
                         e.preventDefault();
                         self.adjustDate('subtract', 1);
                         break;
+                      }
                     case 38:
+                      if( !opts.liveEdit ) {
                         self.adjustDate('subtract', 7);
                         break;
+                      }
                     case 39:
+                      if( !opts.liveEdit ) {
                         self.adjustDate('add', 1);
                         break;
+                      }
                     case 40:
+                      if( !opts.liveEdit ) {
                         self.adjustDate('add', 7);
                         break;
+                      }
                 }
             }
         };
@@ -531,18 +541,20 @@
 
         self._onLiveChange = function(e)
         {
-          var date;
 
-          if (hasMoment) {
-            date = moment(opts.field.value, opts.format, opts.formatStrict);
-            date = (date && date.isValid()) ? date.toDate() : null;
-          } else {
-              date = new Date(Date.parse(opts.field.value));
-          }
-          if ( isDate( date ) ) {
-            self.gotoDate(date);
-            if(self.regex.test(opts.field.value)) {
-              self.setDate( date );
+          if( e.keyCode != 27 && e.keyCode != 37 && e.keyCode != 38 && e.keyCode != 39 && e.keyCode != 40 ) {
+            var date;
+            if (hasMoment) {
+              date = moment(opts.field.value, opts.format, opts.formatStrict);
+              date = (date && date.isValid()) ? date.toDate() : null;
+            } else {
+                date = new Date(Date.parse(opts.field.value));
+            }
+            if ( isDate( date ) ) {
+              self.gotoDate(date);
+              if(self.regex.test(opts.field.value)) {
+                self.setDate( date );
+              }
             }
           }
         };
@@ -620,7 +632,10 @@
             }
 
             addEvent(opts.field, 'change', self._onInputChange);
-            addEvent(opts.field, 'keyup', self._onLiveChange);
+
+            if( opts.liveEdit ) {
+              addEvent(opts.field, 'keyup', self._onLiveChange);
+            }
 
             if (!opts.defaultDate) {
                 if (hasMoment && opts.field.value) {

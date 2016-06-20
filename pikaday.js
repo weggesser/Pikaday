@@ -35,6 +35,9 @@
      */
     var hasMoment = typeof moment === 'function',
 
+    isBrowsingMonths = false,
+    isBrowsingYears = false,
+
     hasEventListeners = !!window.addEventListener,
 
     document = window.document,
@@ -253,6 +256,7 @@
             nextYear      : 'Next Year',
             prevYear      : 'Previous Year',
             months        : ['January','February','March','April','May','June','July','August','September','October','November','December'],
+            monthsShort   : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
             weekdays      : ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
             weekdaysShort : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
         },
@@ -335,7 +339,47 @@
 
     renderBody = function(rows)
     {
-        return '<tbody>' + rows.join('') + '</tbody>';
+      return '<tbody>' + rows.join('') + '</tbody>';
+    },
+
+
+    renderMonthBrowserGrid = function(opts, month) {
+      var html = "";
+      html += '<table class="months browser-table">';
+      for( var i = 0; i < opts.i18n.months.length; i++ ) {
+        if( i == 0 || i == 6 ) html += "<tr>";
+        html += '<td data="' + i + '"  class="select-month' + ( month == i ? ' current' : '') + '">' + opts.i18n.monthsShort[i] + "</td>";
+        if( i == 5 || i == 11 ) html += "<tr>";
+      }
+      html += '</table>';
+      return html;
+    },
+
+    renderYearBrowserGrid = function(opts, year) {
+      var html = "";
+      var decade = getDecade( year );
+
+      html += '<table class="years browser-table">';
+      for( var i = 0; i < decade.length; i++ ) {
+        if(i % 5 === 0 && i != 0) html += "</tr>";
+        if(i % 5 === 0 && i != decade.length - 1) html += "<tr>";
+        html += '<td data="' + decade[i] + '" class="select-year' + ( year == decade[i] ? ' current' : '') + '">' + decade[i] + "</td>";
+
+      }
+      html += '</table>';
+      html += '<div class="year-browse"><span class="next-decade">Next decade</span>';
+      html += '<span class="prev-decade">Previous decade</span></div>'
+      return html;
+    },
+
+    getDecade = function( year ) {
+      var start = (Math.floor( year / 10 ) * 10);
+      var end = start + 9;
+      var decade = [];
+      for(var i = start; i <= end; i++) {
+        decade.push(i);
+      }
+      return decade;
     },
 
     renderHead = function(opts)
@@ -371,22 +415,30 @@
                 opts.i18n.months[i] + '</option>');
         }
 
-        monthHtml = '<div class="pika-label">' + opts.i18n.months[month] + '<select class="pika-select pika-select-month" tabindex="-1">' + arr.join('') + '</select></div>';
-
-        if (isArray(opts.yearRange)) {
-            i = opts.yearRange[0];
-            j = opts.yearRange[1] + 1;
+        if( !opts.browser ) {
+          monthHtml = '<div class="pika-label">' + opts.i18n.months[month] + '<select class="pika-select pika-select-month" tabindex="-1">' + arr.join('') + '</select></div>';
         } else {
-            i = year - opts.yearRange;
-            j = 1 + year + opts.yearRange;
+          monthHtml = '<div class="pika-label browser month">' + opts.i18n.months[month] + '</div>';
         }
 
-        for (arr = []; i < j && i <= opts.maxYear; i++) {
-            if (i >= opts.minYear) {
-                arr.push('<option value="' + i + '"' + (i === year ? ' selected="selected"': '') + '>' + (i) + '</option>');
-            }
+        if( !opts.browser ) {
+          if (isArray(opts.yearRange)) {
+              i = opts.yearRange[0];
+              j = opts.yearRange[1] + 1;
+          } else {
+              i = year - opts.yearRange;
+              j = 1 + year + opts.yearRange;
+          }
+
+          for (arr = []; i < j && i <= opts.maxYear; i++) {
+              if (i >= opts.minYear) {
+                  arr.push('<option value="' + i + '"' + (i === year ? ' selected="selected"': '') + '>' + (i) + '</option>');
+              }
+          }
+          yearHtml = '<div class="pika-label">' + year + opts.yearSuffix + '<select class="pika-select pika-select-year" tabindex="-1">' + arr.join('') + '</select></div>';
+        } else {
+          yearHtml = '<div class="pika-label browser year">' + year + opts.yearSuffix + '</div>';
         }
-        yearHtml = '<div class="pika-label">' + year + opts.yearSuffix + '<select class="pika-select pika-select-year" tabindex="-1">' + arr.join('') + '</select></div>';
 
         if (opts.showMonthAfterYear) {
             html += yearHtml + monthHtml;
@@ -426,6 +478,15 @@
         return '<table cellpadding="0" cellspacing="0" class="pika-table" role="grid" aria-labelledby="' + randId + '">' + renderHead(opts) + renderBody(data) + '</table>';
     },
 
+    renderMonthBrowser = function(opts, month, randId)
+    {
+      return '<div id="browser">' + renderMonthBrowserGrid( opts, month ) + '</div>';
+    },
+
+    renderYearBrowser = function(opts, year, randId)
+    {
+      return '<div id="browser">' + renderYearBrowserGrid( opts, year ) + '</div>';
+    },
 
     /**
      * Pikaday constructor
@@ -435,6 +496,9 @@
         var self = this,
             opts = self.config(options);
         self.regex = new RegExp( opts.format.replace(/D/g, "\\d").replace(/Y/g, "\\d").replace(/M/g, "\\d").replace(/\./g, "\\."));
+
+        self.isBrowsingYears = false;
+        self.isBrowsingMonths = false;
 
         self._onMouseDown = function(e)
         {
@@ -472,6 +536,48 @@
                     self.nextYear();
                 }
             }
+
+            if( hasClass(target, "browser") && hasClass(target, "month") ) {
+              self.isBrowsingMonths = !self.isBrowsingMonths;
+              self.isBrowsingYears = false;
+              self.currentDecade = undefined;
+              self.draw();
+            }
+
+            if( hasClass(target, "next-decade")) {
+              self.currentDecade += 10;
+              self.draw();
+            }
+
+            if( hasClass(target, "prev-decade")) {
+              self.currentDecade -= 10;
+              self.draw();
+            }
+
+            if( hasClass(target, "select-year") ) {
+              self.currentDecade = undefined;
+              self.isBrowsingMonths = false;
+              self.isBrowsingYears = false;
+              self.currentDecade = undefined;
+              self.calendars[0].year = parseInt( target.getAttribute("data") );
+              self.adjustCalendars();
+            }
+
+            if( hasClass(target, "select-month") ) {
+
+              self.isBrowsingMonths = false;
+              self.isBrowsingYears = false;
+              self.currentDecade = undefined;
+              self.calendars[0].month = parseInt( target.getAttribute("data") );
+              self.adjustCalendars();
+            }
+
+            if( hasClass(target, "browser") && hasClass(target, "year") ) {
+              self.isBrowsingYears = !self.isBrowsingYears;
+              self.isBrowsingMonths = false;
+              self.draw();
+            }
+
             if (!hasClass(target, 'pika-select')) {
                 // if this is touch event prevent mouse events emulation
                 if (e.preventDefault) {
@@ -483,6 +589,16 @@
             } else {
                 self._c = true;
             }
+        };
+
+        self.getDecade = function( year ) {
+          var start = (Math.floor( year / 10 ) * 10);
+          var end = start + 9;
+          var decade = [];
+          for(var i = start; i <= end; i++) {
+            decade.push(i);
+          }
+          return decade;
         };
 
         self._onChange = function(e)
@@ -538,7 +654,7 @@
         self._onInputChange = function(e)
         {
             var date;
-
+            self.currentDecade = undefined;
             if (e.firedBy === self) {
                 return;
             }
@@ -591,6 +707,10 @@
         self._onInputBlur = function()
         {
             // IE allows pika div to gain focus; catch blur the input field
+
+            self.currentDecade = undefined;
+            self.isBrowsingMonths = false;
+            self.isBrowsingYears = false;
             var pEl = document.activeElement;
             do {
                 if (hasClass(pEl, 'pika-single')) {
@@ -694,7 +814,6 @@
      */
     Pikaday.prototype = {
 
-
         /**
          * configure functionality
          */
@@ -758,7 +877,7 @@
          */
         toString: function(format)
         {
-            return !isDate(this._d) ? '' : hasMoment ? moment(this._d).format(format || this._o.format) : this._d.toDateString();
+          return !isDate(this._d) ? '' : hasMoment ? moment(this._d).format(format || this._o.format) : this._d.toDateString();
         },
 
         /**
@@ -1110,85 +1229,103 @@
          */
         render: function(year, month, randId)
         {
-            var opts   = this._o,
-                now    = new Date(),
-                days   = getDaysInMonth(year, month),
-                before = new Date(year, month, 1).getDay(),
-                data   = [],
-                row    = [];
-            setToStartOfDay(now);
-            if (opts.firstDay > 0) {
-                before -= opts.firstDay;
-                if (before < 0) {
-                    before += 7;
+
+            var opts        = this._o,
+                now         = new Date(),
+                days        = getDaysInMonth(year, month),
+                before      = new Date(year, month, 1).getDay(),
+                data        = [],
+                row         = [];
+
+
+            if( !this.isBrowsingMonths && !this.isBrowsingYears ) {
+              setToStartOfDay(now);
+              if (opts.firstDay > 0) {
+                  before -= opts.firstDay;
+                  if (before < 0) {
+                      before += 7;
+                  }
+              }
+              var previousMonth = month === 0 ? 11 : month - 1,
+                  nextMonth = month === 11 ? 0 : month + 1,
+                  yearOfPreviousMonth = month === 0 ? year - 1 : year,
+                  yearOfNextMonth = month === 11 ? year + 1 : year,
+                  daysInPreviousMonth = getDaysInMonth(yearOfPreviousMonth, previousMonth);
+              var cells = days + before,
+                  after = cells;
+              while(after > 7) {
+                  after -= 7;
+              }
+              cells += 7 - after;
+              for (var i = 0, r = 0; i < cells; i++)
+              {
+                  var day = new Date(year, month, 1 + (i - before)),
+                      isSelected = isDate(this._d) ? compareDates(day, this._d) : false,
+                      isToday = compareDates(day, now),
+                      isEmpty = i < before || i >= (days + before),
+                      dayNumber = 1 + (i - before),
+                      monthNumber = month,
+                      yearNumber = year,
+                      isStartRange = opts.startRange && compareDates(opts.startRange, day),
+                      isEndRange = opts.endRange && compareDates(opts.endRange, day),
+                      isInRange = opts.startRange && opts.endRange && opts.startRange < day && day < opts.endRange,
+                      isDisabled = (opts.minDate && day < opts.minDate) ||
+                                   (opts.maxDate && day > opts.maxDate) ||
+                                   (opts.disableWeekends && isWeekend(day)) ||
+                                   (opts.disableDayFn && opts.disableDayFn(day));
+
+                  if (isEmpty) {
+                      if (i < before) {
+                          dayNumber = daysInPreviousMonth + dayNumber;
+                          monthNumber = previousMonth;
+                          yearNumber = yearOfPreviousMonth;
+                      } else {
+                          dayNumber = dayNumber - days;
+                          monthNumber = nextMonth;
+                          yearNumber = yearOfNextMonth;
+                      }
+                  }
+
+                  var dayConfig = {
+                          day: dayNumber,
+                          month: monthNumber,
+                          year: yearNumber,
+                          isSelected: isSelected,
+                          isToday: isToday,
+                          isDisabled: isDisabled,
+                          isEmpty: isEmpty,
+                          isStartRange: isStartRange,
+                          isEndRange: isEndRange,
+                          isInRange: isInRange,
+                          showDaysInNextAndPreviousMonths: opts.showDaysInNextAndPreviousMonths
+                      };
+
+                  row.push(renderDay(dayConfig));
+
+                  if (++r === 7) {
+                      if (opts.showWeekNumber) {
+                          row.unshift(renderWeek(i - before, month, year));
+                      }
+                      data.push(renderRow(row, opts.isRTL));
+                      row = [];
+                      r = 0;
+                  }
+              }
+              return renderTable(opts, data, randId);
+            } else {
+              var d = new Date();
+              if( this._d ) { d = this._d; }
+              console.log(this._d);
+              if( this.isBrowsingMonths == true ) {
+                return renderMonthBrowser(opts, this.calendars[0].month, randId);
+              } else if ( this.isBrowsingYears == true ) {
+                if (typeof(this.currentDecade) == "undefined") {
+                  this.currentDecade = this.calendars[0].year
                 }
+                return renderYearBrowser(opts, this.currentDecade , randId);
+              }
             }
-            var previousMonth = month === 0 ? 11 : month - 1,
-                nextMonth = month === 11 ? 0 : month + 1,
-                yearOfPreviousMonth = month === 0 ? year - 1 : year,
-                yearOfNextMonth = month === 11 ? year + 1 : year,
-                daysInPreviousMonth = getDaysInMonth(yearOfPreviousMonth, previousMonth);
-            var cells = days + before,
-                after = cells;
-            while(after > 7) {
-                after -= 7;
-            }
-            cells += 7 - after;
-            for (var i = 0, r = 0; i < cells; i++)
-            {
-                var day = new Date(year, month, 1 + (i - before)),
-                    isSelected = isDate(this._d) ? compareDates(day, this._d) : false,
-                    isToday = compareDates(day, now),
-                    isEmpty = i < before || i >= (days + before),
-                    dayNumber = 1 + (i - before),
-                    monthNumber = month,
-                    yearNumber = year,
-                    isStartRange = opts.startRange && compareDates(opts.startRange, day),
-                    isEndRange = opts.endRange && compareDates(opts.endRange, day),
-                    isInRange = opts.startRange && opts.endRange && opts.startRange < day && day < opts.endRange,
-                    isDisabled = (opts.minDate && day < opts.minDate) ||
-                                 (opts.maxDate && day > opts.maxDate) ||
-                                 (opts.disableWeekends && isWeekend(day)) ||
-                                 (opts.disableDayFn && opts.disableDayFn(day));
 
-                if (isEmpty) {
-                    if (i < before) {
-                        dayNumber = daysInPreviousMonth + dayNumber;
-                        monthNumber = previousMonth;
-                        yearNumber = yearOfPreviousMonth;
-                    } else {
-                        dayNumber = dayNumber - days;
-                        monthNumber = nextMonth;
-                        yearNumber = yearOfNextMonth;
-                    }
-                }
-
-                var dayConfig = {
-                        day: dayNumber,
-                        month: monthNumber,
-                        year: yearNumber,
-                        isSelected: isSelected,
-                        isToday: isToday,
-                        isDisabled: isDisabled,
-                        isEmpty: isEmpty,
-                        isStartRange: isStartRange,
-                        isEndRange: isEndRange,
-                        isInRange: isInRange,
-                        showDaysInNextAndPreviousMonths: opts.showDaysInNextAndPreviousMonths
-                    };
-
-                row.push(renderDay(dayConfig));
-
-                if (++r === 7) {
-                    if (opts.showWeekNumber) {
-                        row.unshift(renderWeek(i - before, month, year));
-                    }
-                    data.push(renderRow(row, opts.isRTL));
-                    row = [];
-                    r = 0;
-                }
-            }
-            return renderTable(opts, data, randId);
         },
 
         isVisible: function()

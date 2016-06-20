@@ -259,7 +259,7 @@
         theme: null,
 
         // Live change calendar on typing
-        liveEdit: true,
+        liveEdit: false,
 
         // callback function
         onSelect: null,

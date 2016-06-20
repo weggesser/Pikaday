@@ -100,22 +100,32 @@ http://nicolasgallagher.com/micro-clearfix-hack/
     opacity: 1;
 }
 
-.pika-prev,
+.pika-prev, .pika-prev-year,
 .is-rtl .pika-next {
     float: left;
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAeCAYAAAAsEj5rAAAAUklEQVR42u3VMQoAIBADQf8Pgj+OD9hG2CtONJB2ymQkKe0HbwAP0xucDiQWARITIDEBEnMgMQ8S8+AqBIl6kKgHiXqQqAeJepBo/z38J/U0uAHlaBkBl9I4GwAAAABJRU5ErkJggg==');
     *left: 0;
 }
 
-.pika-next,
+.pika-next, .pika-next-year,
 .is-rtl .pika-prev {
     float: right;
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAeCAYAAAAsEj5rAAAAU0lEQVR42u3VOwoAMAgE0dwfAnNjU26bYkBCFGwfiL9VVWoO+BJ4Gf3gtsEKKoFBNTCoCAYVwaAiGNQGMUHMkjGbgjk2mIONuXo0nC8XnCf1JXgArVIZAQh5TKYAAAAASUVORK5CYII=');
     *right: 0;
 }
 
+.pika-next-year {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAeCAYAAAAsEj5rAAABT2lUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4KPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iWE1QIENvcmUgNS41LjAiPgogPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iL1VzZXJzL3N3ZWdnZXNzZXIvRG93bmxvYWRzL2ZyZWVmb3JtYXR0ZXItb3V0cHV0LnBuZyIvPgogPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4KPD94cGFja2V0IGVuZD0iciI/PlgRkWsAAAGGaUNDUHNSR0IgSUVDNjE5NjYtMi4xAAAokXWRuUtDQRCHvyReeBDECBYWKdRCVDSKaKcJ4kEIISp4Nckzh5Do470EEUsL2xQpPLBRxMZaO/EfEARBrUSwFQsFGwnP2SSQIGaW3f32tzOzu7NgX0pqKbNmEFKbaSM07XUvLa+461+po5VGumkPa6Y+GQz6qWrfj9jU/NCvclX3+9ea1qOmBrYG4QlNN9LCM8KB7bSu+EDYpSXC68KXwn2GXFD4WemRIr8rjhfYrnK6jIWQT9gl7I5XcKSCtYSREh4R7kolM1rpPuolzdHNxXmlS+/EJMQ0XtzMMoWPUYYYl3GUfjwMyIoq8Z5CfIAtidVk1NnBYIM4CdL0iZqR7FGZY6JHpSXFQ0z9wd/amrFhT/GE5jmofbOsr16oP4b8vmX9nFpW/gwcUpfbXDl+KwdjH6Jny1rXCTj34OqmrEXO4ToLHS962AgXJId0eywGnxfQsgxt99C4WqxbaZ+zJ1jYBf8dHB5Bj/g7134B+shnNciHjN0AAAAJcEhZcwAACxMAAAsTAQCanBgAAABkSURBVEiJ7Y4xCsAwDANN+/5CftxOgcREjqwlHXzgRXCHzYrinzzJfcsLZLRTwZWMdjroZbSngqOM9nSwy2iXgtFN0Yt9O+BWPmzBvgVJUsyLjdjpoJekWBdXkhSzQJJiRXGCD/RxVaeWlYNnAAAAAElFTkSuQmCC');
+}
+
+.pika-prev-year {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAeCAYAAAAsEj5rAAABT2lUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4KPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iWE1QIENvcmUgNS41LjAiPgogPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iL1VzZXJzL3N3ZWdnZXNzZXIvRG93bmxvYWRzL2ZyZWVmb3JtYXR0ZXItb3V0cHV0LnBuZyIvPgogPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4KPD94cGFja2V0IGVuZD0iciI/PlgRkWsAAAGGaUNDUHNSR0IgSUVDNjE5NjYtMi4xAAAokXWRuUtDQRCHvyReeBDECBYWKdRCVDSKaKcJ4kEIISp4Nckzh5Do470EEUsL2xQpPLBRxMZaO/EfEARBrUSwFQsFGwnP2SSQIGaW3f32tzOzu7NgX0pqKbNmEFKbaSM07XUvLa+461+po5VGumkPa6Y+GQz6qWrfj9jU/NCvclX3+9ea1qOmBrYG4QlNN9LCM8KB7bSu+EDYpSXC68KXwn2GXFD4WemRIr8rjhfYrnK6jIWQT9gl7I5XcKSCtYSREh4R7kolM1rpPuolzdHNxXmlS+/EJMQ0XtzMMoWPUYYYl3GUfjwMyIoq8Z5CfIAtidVk1NnBYIM4CdL0iZqR7FGZY6JHpSXFQ0z9wd/amrFhT/GE5jmofbOsr16oP4b8vmX9nFpW/gwcUpfbXDl+KwdjH6Jny1rXCTj34OqmrEXO4ToLHS962AgXJId0eywGnxfQsgxt99C4WqxbaZ+zJ1jYBf8dHB5Bj/g7134B+shnNciHjN0AAAAJcEhZcwAACxMAAAsTAQCanBgAAABYSURBVEiJ7Y9BCgAgCASl3h/0YzsnqLteInCggwMNKtI0/7BIn8aU8FDMfvQ8HFPAUzFNPB3TwJdi0bsYZp7ICSzb2cTz5WjkS9HM01HEU1HUw1HGN81TDuPDVae4asMEAAAAAElFTkSuQmCC');
+}
+
 .pika-prev.is-disabled,
-.pika-next.is-disabled {
+.pika-next.is-disabled,
+.pika-prev-year.is-disabled,
+.pika-next-year.is-disabled {
     cursor: default;
     opacity: .2;
 }
@@ -219,4 +229,3 @@ http://nicolasgallagher.com/micro-clearfix-hack/
     border-bottom: none;
     cursor: help;
 }
-

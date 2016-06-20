@@ -260,6 +260,9 @@
         // Theme Classname
         theme: null,
 
+        // Live change calendar on typing
+        liveEdit: true,
+
         // callback function
         onSelect: null,
         onOpen: null,
@@ -431,6 +434,7 @@
     {
         var self = this,
             opts = self.config(options);
+        self.regex = new RegExp( opts.format.replace(/D/g, "\\d").replace(/Y/g, "\\d").replace(/M/g, "\\d").replace(/\./g, "\\."));
 
         self._onMouseDown = function(e)
         {
@@ -501,25 +505,32 @@
             e = e || window.event;
 
             if (self.isVisible()) {
-
                 switch(e.keyCode){
                     case 13:
                     case 27:
                         opts.field.blur();
                         break;
                     case 37:
+                      if( !opts.liveEdit ) {
                         e.preventDefault();
                         self.adjustDate('subtract', 1);
                         break;
+                      }
                     case 38:
+                      if( !opts.liveEdit ) {
                         self.adjustDate('subtract', 7);
                         break;
+                      }
                     case 39:
+                      if( !opts.liveEdit ) {
                         self.adjustDate('add', 1);
                         break;
+                      }
                     case 40:
+                      if( !opts.liveEdit ) {
                         self.adjustDate('add', 7);
                         break;
+                      }
                 }
             }
         };
@@ -545,6 +556,27 @@
                 self.show();
             }
         };
+
+
+        self._onLiveChange = function(e)
+        {
+          if( e.keyCode != 27 && e.keyCode != 37 && e.keyCode != 38 && e.keyCode != 39 && e.keyCode != 40 ) {
+            var date;
+            if (hasMoment) {
+              date = moment(opts.field.value, opts.format, opts.formatStrict);
+              date = (date && date.isValid()) ? date.toDate() : null;
+            } else {
+                date = new Date(Date.parse(opts.field.value));
+            }
+            if ( isDate( date ) ) {
+              self.gotoDate(date);
+              if(self.regex.test(opts.field.value)) {
+                self.setDate( date );
+              }
+            }
+          }
+        };
+
 
         self._onInputFocus = function()
         {
@@ -616,7 +648,12 @@
             } else {
                 opts.field.parentNode.insertBefore(self.el, opts.field.nextSibling);
             }
+
             addEvent(opts.field, 'change', self._onInputChange);
+
+            if( opts.liveEdit ) {
+              addEvent(opts.field, 'keyup', self._onLiveChange);
+            }
 
             if (!opts.defaultDate) {
                 if (hasMoment && opts.field.value) {
@@ -1202,7 +1239,11 @@
             removeEvent(this.el, 'mousedown', this._onMouseDown, true);
             removeEvent(this.el, 'touchend', this._onMouseDown, true);
             removeEvent(this.el, 'change', this._onChange);
+
             if (this._o.field) {
+                if( this._o.liveEdit ) {
+                  removeEvent(this._o.field, 'keyup', this._onLiveChange);
+                }
                 removeEvent(this._o.field, 'change', this._onInputChange);
                 if (this._o.bound) {
                     removeEvent(this._o.trigger, 'click', this._onInputClick);

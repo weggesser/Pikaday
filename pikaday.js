@@ -900,7 +900,7 @@
 
         prevYear: function()
         {
-            this.calendars[0].year--;
+            this.calendars[0].year--;            
             this.adjustCalendars();
         },
 

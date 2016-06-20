@@ -17,9 +17,7 @@
 
     <label for="datepicker">Date:</label>
     <br />
-    2 months <input type="text" id="datepicker-2months">
-    <br />
-    3 months, main aligned to right <input type="text" id="datepicker-3months-right">
+    <input type="text" id="datepicker-2months">
 
     <h2>What is this?</h2>
 
@@ -27,27 +25,16 @@
 
     <p class="small">Copyright © 2013 <a href="http://dbushell.com/">David Bushell</a> | BSD &amp; MIT license | Example by <a href="https://github.com/MoOx">MoOx</a></p>
 
-
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"></script>
     <script src="../pikaday.js"></script>
     <script>
 
     var picker2months = new Pikaday(
     {
-        numberOfMonths: 2,
         field: document.getElementById('datepicker-2months'),
         firstDay: 1,
         browser: true,
-        minDate: new Date(2000, 0, 1),
-        maxDate: new Date(2020, 12, 31),
-        yearRange: [2000, 2020]
-    });
-
-    var picker3monthsRight = new Pikaday(
-    {
-        numberOfMonths: 3,
-        mainCalendar: 'right',
-        field: document.getElementById('datepicker-3months-right'),
-        firstDay: 1,
+        format: 'DD.MM.YYYY',
         minDate: new Date(2000, 0, 1),
         maxDate: new Date(2020, 12, 31),
         yearRange: [2000, 2020]

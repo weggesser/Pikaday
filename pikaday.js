@@ -364,7 +364,11 @@
                 opts.i18n.months[i] + '</option>');
         }
 
-        monthHtml = '<div class="pika-label">' + opts.i18n.months[month] + '<select class="pika-select pika-select-month" tabindex="-1">' + arr.join('') + '</select></div>';
+        if( !opts.browser ) {
+          monthHtml = '<div class="pika-label">' + opts.i18n.months[month] + '<select class="pika-select pika-select-month" tabindex="-1">' + arr.join('') + '</select></div>';
+        } else {
+          monthHtml = '<div class="pika-label browser">' + opts.i18n.months[month] + '</div>';
+        }
 
         if (isArray(opts.yearRange)) {
             i = opts.yearRange[0];
@@ -379,7 +383,12 @@
                 arr.push('<option value="' + i + '"' + (i === year ? ' selected="selected"': '') + '>' + (i) + '</option>');
             }
         }
-        yearHtml = '<div class="pika-label">' + year + opts.yearSuffix + '<select class="pika-select pika-select-year" tabindex="-1">' + arr.join('') + '</select></div>';
+
+        if( !opts.browser ) {
+          yearHtml = '<div class="pika-label">' + year + opts.yearSuffix + '<select class="pika-select pika-select-year" tabindex="-1">' + arr.join('') + '</select></div>';
+        } else {
+          yearHtml = '<div class="pika-label browser">' + year + opts.yearSuffix + '</div>';
+        }
 
         if (opts.showMonthAfterYear) {
             html += yearHtml + monthHtml;
@@ -449,6 +458,12 @@
                     self.nextMonth();
                 }
             }
+
+            if( hasClass(target, "browser") ) {
+              console.log("Show Browser", opts.format );
+
+            }
+
             if (!hasClass(target, 'pika-select')) {
                 // if this is touch event prevent mouse events emulation
                 if (e.preventDefault) {
@@ -702,7 +717,7 @@
          */
         toString: function(format)
         {
-            return !isDate(this._d) ? '' : hasMoment ? moment(this._d).format(format || this._o.format) : this._d.toDateString();
+          return !isDate(this._d) ? '' : hasMoment ? moment(this._d).format(format || this._o.format) : this._d.toDateString();
         },
 
         /**

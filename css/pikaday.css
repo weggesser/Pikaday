@@ -220,3 +220,6 @@ http://nicolasgallagher.com/micro-clearfix-hack/
     cursor: help;
 }
 
+.pika-label.browser {
+  cursor: pointer; 
+}

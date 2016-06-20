@@ -541,7 +541,6 @@
 
         self._onLiveChange = function(e)
         {
-
           if( e.keyCode != 27 && e.keyCode != 37 && e.keyCode != 38 && e.keyCode != 39 && e.keyCode != 40 ) {
             var date;
             if (hasMoment) {
@@ -1208,7 +1207,11 @@
             removeEvent(this.el, 'mousedown', this._onMouseDown, true);
             removeEvent(this.el, 'touchend', this._onMouseDown, true);
             removeEvent(this.el, 'change', this._onChange);
+
             if (this._o.field) {
+                if( this._o.liveEdit ) {
+                  removeEvent(this._o.field, 'keyup', this._onLiveChange);
+                }
                 removeEvent(this._o.field, 'change', this._onInputChange);
                 if (this._o.bound) {
                     removeEvent(this._o.trigger, 'click', this._onInputClick);

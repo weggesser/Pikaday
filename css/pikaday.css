@@ -73,7 +73,9 @@ http://nicolasgallagher.com/micro-clearfix-hack/
 }
 
 .pika-prev,
-.pika-next {
+.pika-next,
+.pika-prev-year,
+.pika-next-year {
     display: block;
     cursor: pointer;
     position: relative;
@@ -96,7 +98,9 @@ http://nicolasgallagher.com/micro-clearfix-hack/
 }
 
 .pika-prev:hover,
-.pika-next:hover {
+.pika-next:hover,
+.pika-prev-year:hover,
+.pika-next-year:hover {
     opacity: 1;
 }
 

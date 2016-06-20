@@ -250,6 +250,8 @@
         i18n: {
             previousMonth : 'Previous Month',
             nextMonth     : 'Next Month',
+            nextYear      : 'Next Year',
+            prevYear      : 'Previous Year',
             months        : ['January','February','March','April','May','June','July','August','September','October','November','December'],
             weekdays      : ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
             weekdaysShort : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
@@ -355,7 +357,9 @@
             monthHtml,
             yearHtml,
             prev = true,
-            next = true;
+            next = true,
+            prevYear = true,
+            nextYear = true;
 
         for (arr = [], i = 0; i < 12; i++) {
             arr.push('<option value="' + (year === refYear ? i - c : 12 + i - c) + '"' +
@@ -395,9 +399,18 @@
             next = false;
         }
 
+        if(opts.skipYears) {
+          html += '<button class="pika-prev-year' + (prevYear ? '' : ' is-disabled') + '" type="button">' + opts.i18n.previousYear + '</button>';
+        }
+
         if (c === 0) {
             html += '<button class="pika-prev' + (prev ? '' : ' is-disabled') + '" type="button">' + opts.i18n.previousMonth + '</button>';
         }
+
+        if(opts.skipYears) {
+          html += '<button class="pika-next-year' + (nextYear ? '' : ' is-disabled') + '" type="button">' + opts.i18n.nextYear + '</button>';
+        }
+
         if (c === (instance._o.numberOfMonths - 1) ) {
             html += '<button class="pika-next' + (next ? '' : ' is-disabled') + '" type="button">' + opts.i18n.nextMonth + '</button>';
         }
@@ -447,6 +460,12 @@
                 }
                 else if (hasClass(target, 'pika-next')) {
                     self.nextMonth();
+                }
+                else if (hasClass(target, 'pika-prev-year')) {
+                    self.prevYear();
+                }
+                else if (hasClass(target, 'pika-next-year')) {
+                    self.nextYear();
                 }
             }
             if (!hasClass(target, 'pika-select')) {
@@ -869,6 +888,19 @@
         prevMonth: function()
         {
             this.calendars[0].month--;
+            this.adjustCalendars();
+        },
+
+
+        nextYear: function()
+        {
+            this.calendars[0].year++;
+            this.adjustCalendars();
+        },
+
+        prevYear: function()
+        {
+            this.calendars[0].year--;
             this.adjustCalendars();
         },
 

@@ -552,7 +552,7 @@
             if ( isDate( date ) ) {
               self.gotoDate(date);
               if(self.regex.test(opts.field.value)) {
-                self.setDate( date );
+                self.setDate( date, false, true );
               }
             }
           }
@@ -771,12 +771,12 @@
         /**
          * set the current selection
          */
-        setDate: function(date, preventOnSelect)
+        setDate: function(date, preventOnSelect, doNotChangeField)
         {
             if (!date) {
                 this._d = null;
 
-                if (this._o.field) {
+                if (this._o.field && !doNotChangeField) {
                     this._o.field.value = '';
                     fireEvent(this._o.field, 'change', { firedBy: this });
                 }
@@ -803,7 +803,8 @@
             setToStartOfDay(this._d);
             this.gotoDate(this._d);
 
-            if (this._o.field) {
+            if (( this._o.field && !doNotChangeField ) ||
+                ( this._o.field && doNotChangeField && this._o.field.value != this.toString() )) {
                 this._o.field.value = this.toString();
                 fireEvent(this._o.field, 'change', { firedBy: this });
             }

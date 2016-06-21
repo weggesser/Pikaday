@@ -455,7 +455,7 @@
         }
 
         if(opts.skipYears) {
-          html += '<button class="pika-prev-year' + (prevYear ? '' : ' is-disabled') + '" type="button">' + opts.i18n.previousYear + '</button>';
+          html += '<button class="pika-prev-year' + ( instance._o.minYear < year ? '' : ' is-disabled' ) + '" type="button">' + opts.i18n.previousYear + '</button>';
         }
 
         if (c === 0) {
@@ -463,7 +463,7 @@
         }
 
         if(opts.skipYears) {
-          html += '<button class="pika-next-year' + (nextYear ? '' : ' is-disabled') + '" type="button">' + opts.i18n.nextYear + '</button>';
+          html += '<button class="pika-next-year' + (instance._o.maxYear > year ? '' : ' is-disabled') + '" type="button">' + opts.i18n.nextYear + '</button>';
         }
 
         if (c === (instance._o.numberOfMonths - 1) ) {
@@ -1056,7 +1056,7 @@
 
         prevYear: function()
         {
-            this.calendars[0].year--;            
+            this.calendars[0].year--;
             this.adjustCalendars();
         },
 
